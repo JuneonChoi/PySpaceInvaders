@@ -7,6 +7,13 @@ from pygame import mixer
 # Intialize the pygame
 pygame.init()
 
+# Define the colors we will use in RGB format
+black = (0, 0, 0)
+white = (255, 255, 255)
+blue = (0, 0, 255)
+green = (0, 255, 0)
+red = (255, 0, 0)
+
 # create the screen
 s_width = 1200
 s_height = 800
@@ -24,6 +31,23 @@ pygame.display.set_caption("Space Invader")
 icon = pygame.image.load('ufo.png')
 pygame.display.set_icon(icon)
 
+# Score
+score_value = 0
+score_font = pygame.font.Font('freesansbold.ttf', 32)
+
+scoreX = 10
+scoreY = 10
+
+#Level
+level_value = 1
+level_font = pygame.font.Font('freesansbold.ttf', 32)
+
+levelX = s_width / 2 - 5  #txt size == 10 * 10
+levelY = scoreY
+
+level_max = 3
+level_next = 3
+
 # Player
 playerImg = pygame.image.load('player.png')
 playerX = s_width / 2 - 32
@@ -32,19 +56,23 @@ playerX_change = 0
 
 # Enemy
 enemyImg = []
+
+for i in range(level_max):
+    enemyImg.append(pygame.image.load('enemy'+ str( i ) + '.png'))
+
 enemyX = []
 enemyY = []
 enemyX_change = []
 enemyY_change = 70
-num_of_enemies = 9
-
 enemyX_limit = s_width - 64
 
-for i in range(num_of_enemies):
-    enemyImg.append(pygame.image.load('enemy.png'))
+enemy_num = 6
+enemy_speed = 3  #default == 3
+
+for i in range(enemy_num):
     enemyX.append(random.randrange(0, enemyX_limit, 70))  #enemy_size w/ some space == 70
     enemyY.append(random.randrange(50, 190, 70))
-    enemyX_change.append(4)
+    enemyX_change.append(enemy_speed)
 
 # Bullet
 
@@ -58,24 +86,21 @@ bulletX_change = 0
 bulletY_change = 10
 bullet_state = "ready"
 
-# Score
-score_value = 0
-font = pygame.font.Font('freesansbold.ttf', 32)
-
-textX = 10
-textY = 10
-
 # Game Over
 over_font = pygame.font.Font('freesansbold.ttf', 64)
 
 
 def show_score(x, y):
-    score = font.render("Score : " + str(score_value), True, (255, 255, 255))
+    score = score_font.render("Score : " + str(score_value), True, white)
     screen.blit(score, (x, y))
 
 
+def show_level(x, y):
+    level = level_font.render("Level  : " + str(level_value), True, red)
+    screen.blit(level, (x, y))
+
 def game_over_text():
-    over_text = over_font.render("GAME OVER", True, (255, 255, 255))
+    over_text = over_font.render("GAME OVER", True, white)
     screen.blit(over_text, (200, 250))
 
 
@@ -140,22 +165,36 @@ while running:
     elif playerX >= enemyX_limit:
         playerX = enemyX_limit
 
+    # Level System
+    if score_value == level_next:
+        if level_value < level_max:
+            level_value += 1
+            level_next += level_next
+
+            enemy_speed += level_value - 1
+            enemy_num += level_value
+            
+            for i in range(enemy_num):  #for not to be out of index
+                enemyX.append(random.randrange(0, enemyX_limit, 70))
+                enemyY.append(random.randrange(50, 190, 70))
+                enemyX_change.append(enemy_speed)
+
     # Enemy Movement
-    for i in range(num_of_enemies):
+    for i in range(enemy_num):
 
         # Game Over
         if enemyY[i] > playerY - 40:
-            for j in range(num_of_enemies):
+            for j in range(enemy_num):
                 enemyY[j] = 9999
             game_over_text()
             break
 
         enemyX[i] += enemyX_change[i]
         if enemyX[i] <= 0:
-            enemyX_change[i] = 4
+            enemyX_change[i] = enemy_speed
             enemyY[i] += enemyY_change
         elif enemyX[i] >= enemyX_limit:
-            enemyX_change[i] = -4
+            enemyX_change[i] = -enemy_speed
             enemyY[i] += enemyY_change
 
         # Collision
@@ -169,7 +208,7 @@ while running:
             enemyX[i] = random.randrange(0, enemyX_limit, 70)  #enemy_size w/ some space == 70
             enemyY[i] = random.randrange(50, 190, 70)
 
-        enemy(enemyX[i], enemyY[i], i)
+        enemy(enemyX[i], enemyY[i], level_value - 1)
 
     # Bullet Movement
     if bulletY <= 0:
@@ -181,5 +220,6 @@ while running:
         bulletY -= bulletY_change
 
     player(playerX, playerY)
-    show_score(textX, textY)
+    show_score(scoreX, scoreY)
+    show_level(levelX, levelY)
     pygame.display.update()
