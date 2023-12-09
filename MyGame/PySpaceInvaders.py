@@ -8,7 +8,9 @@ from pygame import mixer
 pygame.init()
 
 # create the screen
-screen = pygame.display.set_mode((800, 600))
+s_width = 1200
+s_height = 800
+screen = pygame.display.set_mode((s_width, s_height))
 
 # Background
 background = pygame.image.load('background.png')
@@ -24,8 +26,8 @@ pygame.display.set_icon(icon)
 
 # Player
 playerImg = pygame.image.load('player.png')
-playerX = 370
-playerY = 480
+playerX = s_width / 2 - 32
+playerY = s_height - 120
 playerX_change = 0
 
 # Enemy
@@ -36,9 +38,11 @@ enemyX_change = []
 enemyY_change = 70
 num_of_enemies = 9
 
+enemyX_limit = s_width - 64
+
 for i in range(num_of_enemies):
     enemyImg.append(pygame.image.load('enemy.png'))
-    enemyX.append(random.randrange(0, 736, 70))
+    enemyX.append(random.randrange(0, enemyX_limit, 70))  #enemy_size w/ some space == 70
     enemyY.append(random.randrange(50, 190, 70))
     enemyX_change.append(4)
 
@@ -49,7 +53,7 @@ for i in range(num_of_enemies):
 
 bulletImg = pygame.image.load('bullet.png')
 bulletX = 0
-bulletY = 480
+bulletY = playerY
 bulletX_change = 0
 bulletY_change = 10
 bullet_state = "ready"
@@ -134,16 +138,16 @@ while running:
     playerX += playerX_change
     if playerX <= 0:
         playerX = 0
-    elif playerX >= 736:
-        playerX = 736
+    elif playerX >= enemyX_limit:
+        playerX = enemyX_limit
 
     # Enemy Movement
     for i in range(num_of_enemies):
 
         # Game Over
-        if enemyY[i] > 440:
+        if enemyY[i] > playerY - 40:
             for j in range(num_of_enemies):
-                enemyY[j] = 2000
+                enemyY[j] = 9999
             game_over_text()
             break
 
@@ -151,7 +155,7 @@ while running:
         if enemyX[i] <= 0:
             enemyX_change[i] = 4
             enemyY[i] += enemyY_change
-        elif enemyX[i] >= 736:
+        elif enemyX[i] >= enemyX_limit:
             enemyX_change[i] = -4
             enemyY[i] += enemyY_change
 
@@ -160,17 +164,17 @@ while running:
         if collision:
             explosionSound = mixer.Sound("explosion.wav")
             explosionSound.play()
-            bulletY = 480
+            bulletY = playerY
             bullet_state = "ready"
             score_value += 1
-            enemyX[i] = random.randrange(0, 736, 70)
+            enemyX[i] = random.randrange(0, enemyX_limit, 70)  #enemy_size w/ some space == 70
             enemyY[i] = random.randrange(50, 190, 70)
 
         enemy(enemyX[i], enemyY[i], i)
 
     # Bullet Movement
     if bulletY <= 0:
-        bulletY = 480
+        bulletY = playerY
         bullet_state = "ready"
 
     if bullet_state == "fire":
