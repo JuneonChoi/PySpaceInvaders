@@ -33,15 +33,14 @@ enemyImg = []
 enemyX = []
 enemyY = []
 enemyX_change = []
-enemyY_change = []
-num_of_enemies = 6
+enemyY_change = 70
+num_of_enemies = 9
 
 for i in range(num_of_enemies):
     enemyImg.append(pygame.image.load('enemy.png'))
-    enemyX.append(random.randint(0, 736))
-    enemyY.append(random.randint(50, 150))
+    enemyX.append(random.randrange(0, 736, 70))
+    enemyY.append(random.randrange(50, 190, 70))
     enemyX_change.append(4)
-    enemyY_change.append(40)
 
 # Bullet
 
@@ -151,10 +150,10 @@ while running:
         enemyX[i] += enemyX_change[i]
         if enemyX[i] <= 0:
             enemyX_change[i] = 4
-            enemyY[i] += enemyY_change[i]
+            enemyY[i] += enemyY_change
         elif enemyX[i] >= 736:
             enemyX_change[i] = -4
-            enemyY[i] += enemyY_change[i]
+            enemyY[i] += enemyY_change
 
         # Collision
         collision = isCollision(enemyX[i], enemyY[i], bulletX, bulletY)
@@ -164,8 +163,8 @@ while running:
             bulletY = 480
             bullet_state = "ready"
             score_value += 1
-            enemyX[i] = random.randint(0, 736)
-            enemyY[i] = random.randint(50, 150)
+            enemyX[i] = random.randrange(0, 736, 70)
+            enemyY[i] = random.randrange(50, 190, 70)
 
         enemy(enemyX[i], enemyY[i], i)
 
