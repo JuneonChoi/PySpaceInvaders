@@ -32,19 +32,16 @@ icon = pygame.image.load('ufo.png')
 pygame.display.set_icon(icon)
 
 # Score
-score_value = 0
 score_font = pygame.font.Font('freesansbold.ttf', 32)
-
 scoreX = 10
 scoreY = 10
+score_value = 0
 
 #Level
-level_value = 1
 level_font = pygame.font.Font('freesansbold.ttf', 32)
-
 levelX = s_width / 2 - 5  #txt size == 10 * 10
-levelY = scoreY
-
+levelY = 10
+level_value = 1
 level_max = 3
 level_next = 3
 
@@ -60,12 +57,12 @@ enemyImg = []
 for i in range(level_max):
     enemyImg.append(pygame.image.load('enemy'+ str( i ) + '.png'))
 
+explosionSound = mixer.Sound("explosion.wav")
 enemyX = []
 enemyY = []
 enemyX_change = []
 enemyY_change = 70
 enemyX_limit = s_width - 64
-
 enemy_num = 6
 enemy_speed = 3  #default == 3
 
@@ -80,11 +77,10 @@ for i in range(enemy_num):
 # Fire - The bullet is currently moving
 
 bulletImg = pygame.image.load('bullet.png')
-bulletX = 0
-bulletY = playerY
-bulletX_change = 0
+bulletSound = mixer.Sound("laser.wav")
+bullet_InScreen = 3
+bullet = [[0, 0, "ready"] for i in range(bullet_InScreen)]  #x,y,state
 bulletY_change = 10
-bullet_state = "ready"
 
 # Game Over
 over_font = pygame.font.Font('freesansbold.ttf', 64)
@@ -108,14 +104,14 @@ def player(x, y):
     screen.blit(playerImg, (x, y))
 
 
-def enemy(x, y, i):
-    screen.blit(enemyImg[i], (x, y))
+def enemy(x, y, level):
+    screen.blit(enemyImg[level], (x, y))
 
 
-def fire_bullet(x, y):
-    global bullet_state
-    bullet_state = "fire"
-    screen.blit(bulletImg, (x + 16, y + 10))
+def fire_bullet(bullet_num):
+    global bullet
+    bullet[bullet_num][2] = "fire"
+    screen.blit(bulletImg, (bullet[bullet_num][0] + 16, bullet[bullet_num][1] + 10))
 
 
 def isCollision(enemyX, enemyY, bulletX, bulletY):
@@ -145,12 +141,13 @@ while running:
             if event.key == pygame.K_RIGHT:
                 playerX_change = 5
             if event.key == pygame.K_SPACE:
-                if bullet_state == "ready":
-                    bulletSound = mixer.Sound("laser.wav")
-                    bulletSound.play()
-                    # Get the current x cordinate of the spaceship
-                    bulletX = playerX
-                    fire_bullet(bulletX, bulletY)
+                for i in range(len(bullet)):
+                    if bullet[i][2] == "ready":
+                        bulletSound = mixer.Sound("laser.wav")
+                        bulletSound.play()
+                        # Get the current x cordinate of the spaceship
+                        bullet[i][0] = playerX
+                        fire_bullet(i)
 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
@@ -196,28 +193,29 @@ while running:
         elif enemyX[i] >= enemyX_limit:
             enemyX_change[i] = -enemy_speed
             enemyY[i] += enemyY_change
-
-        # Collision
-        collision = isCollision(enemyX[i], enemyY[i], bulletX, bulletY)
-        if collision:
-            explosionSound = mixer.Sound("explosion.wav")
-            explosionSound.play()
-            bulletY = playerY
-            bullet_state = "ready"
-            score_value += 1
-            enemyX[i] = random.randrange(0, enemyX_limit, 70)  #enemy_size w/ some space == 70
-            enemyY[i] = random.randrange(50, 190, 70)
+        for j in range(len(bullet)):
+            # Collision
+            collision = isCollision(enemyX[i], enemyY[i], bullet[j][0], bullet[j][1])
+            if collision:
+                explosionSound = mixer.Sound("explosion.wav")
+                explosionSound.play()
+                bullet[j][1] = playerY
+                bullet[j][2] = "ready"
+                score_value += 1
+                enemyX[i] = random.randrange(0, enemyX_limit, 70)  #enemy_size w/ some space == 70
+                enemyY[i] = random.randrange(50, 190, 70)
 
         enemy(enemyX[i], enemyY[i], level_value - 1)
-
+        
     # Bullet Movement
-    if bulletY <= 0:
-        bulletY = playerY
-        bullet_state = "ready"
+    for j in range(len(bullet)):
+        if bullet[j][1] <= 0:
+            bullet[j][1] = playerY
+            bullet[j][2] = "ready"
 
-    if bullet_state == "fire":
-        fire_bullet(bulletX, bulletY)
-        bulletY -= bulletY_change
+        if bullet[j][2] == "fire":
+            fire_bullet(j)
+            bullet[j][1] -= bulletY_change
 
     player(playerX, playerY)
     show_score(scoreX, scoreY)
