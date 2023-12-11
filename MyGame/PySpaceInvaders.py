@@ -133,15 +133,10 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-
-        # if keystroke is pressed check whether its right or left
+        #Quit
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 running = False
-            if event.key == pygame.K_LEFT:
-                playerX_change = -5
-            if event.key == pygame.K_RIGHT:
-                playerX_change = 5
             if event.key == pygame.K_SPACE:
                 for i in range(len(bullet)):
                     if bullet[i][2] == "ready":
@@ -150,19 +145,22 @@ while running:
                         # Get the current x cordinate of the spaceship
                         bullet[i][0] = playerX
                         fire_bullet(i)
-
-        if event.type == pygame.KEYUP:
-            if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
-                playerX_change = 0
-
+    #Player movement
+    pygame.event.pump()
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_LEFT]:
+        if playerX <= 0:
+            playerX = 0
+        else:
+            playerX -= 5
+    elif keys[pygame.K_RIGHT]:
+        if playerX >= s_width - 64:
+            playerX = s_width - 64
+        else:
+            playerX += 5
+        
     # 5 = 5 + -0.1 -> 5 = 5 - 0.1
     # 5 = 5 + 0.1
-
-    playerX += playerX_change
-    if playerX <= 0:
-        playerX = 0
-    elif playerX >= enemyX_limit:
-        playerX = enemyX_limit
 
     # Level System
     if score_value == level_next:
