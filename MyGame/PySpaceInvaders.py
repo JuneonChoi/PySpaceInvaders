@@ -78,10 +78,6 @@ def game():
     level_value = 1
     level_max = 3
     level_next = 3
-    
-    #transform
-    transform = False
-    count = 4
 
     # Player (img size = 136 * 136 px)
     playerImgs = []
@@ -98,13 +94,10 @@ def game():
     player_speed = 8
 
     # Enemy (img size = 64 * 64 px)
-    enemyImgs = []
+    enemyImg = []
 
-    for i in range(9):
-        enemyImgs.append(pygame.image.load('enemy/enemy'+ str(i+1) + '.png'))
-
-    enemyImg_index = 0
-    enemyImg = enemyImgs[enemyImg_index]
+    for i in range(level_max):
+        enemyImg.append(pygame.image.load('enemy'+ str( i ) + '.png'))
 
     explosionSound = mixer.Sound("explosion.wav")
     enemyX = []
@@ -135,8 +128,8 @@ def game():
         screen.blit(playerImg, (x, y))
 
 
-    def enemy(x, y, index):
-        screen.blit(enemyImgs[index], (x, y))
+    def enemy(x, y, level):
+        screen.blit(enemyImg[level], (x, y))
 
 
     def fire_bullet(bullet_num):
@@ -205,19 +198,11 @@ def game():
                 level_next += level_next
                 enemy_speed += enemy_speed // 4
                 enemy_num += level_value
-                transform = True
                 
                 for i in range(enemy_num):  #For not to be out of index
                     enemyX.append(random.randrange(0, enemyX_limit, 70))
                     enemyY.append(random.randrange(50, 190, 70))
                     enemyX_change.append(enemy_speed)
-                    
-                if transform == True:
-                    enemyImg_index += 1
-                    count -= 1
-                if count == 0:
-                    count = 4
-                    transform = False
 
         
         for i in range(enemy_num):
@@ -254,7 +239,7 @@ def game():
                     enemyY[i] = random.randrange(50, 190, 70)
                     
             # Enemy Movement - 2
-            enemy(enemyX[i], enemyY[i], enemyImg_index)
+            enemy(enemyX[i], enemyY[i], level_value - 1)
             
         # Bullet Movement
         for j in range(len(bullet)):
@@ -269,7 +254,6 @@ def game():
         player(playerX, playerY)
         show_score(scoreX, scoreY)
         show_level(levelX, levelY)
-        
         pygame.display.update()
 
          # Animation sprite index cycle        
