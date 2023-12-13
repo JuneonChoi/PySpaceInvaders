@@ -27,7 +27,7 @@ pygame.display.set_caption("Space Invader")
 icon = pygame.image.load('ufo.png')
 pygame.display.set_icon(icon)
 
-# Bullet
+# Bullet (img size = 64 * 64px)
 
 # Ready - You can't see the bullet on the screen
 # Fire - The bullet is currently moving
@@ -36,7 +36,7 @@ bulletImg = pygame.image.load('bullet.png')
 bulletSound = mixer.Sound("laser.wav")
 bullet_InScreen = 3
 bullet = [[-100, -100, "ready"] for i in range(bullet_InScreen)]  #x,y,state
-bulletY_change = 10
+bulletY_change = 20
 
 # Define the colors we will use in RGB format
 black = (0, 0, 0)
@@ -67,13 +67,14 @@ def game():
     level_max = 3
     level_next = 3
 
-    # Player
+    # Player (img size = 136 * 136 px)
     playerImg = pygame.image.load('player.png')
-    playerX = s_width / 2 - 32
-    playerY = s_height - 120
+    playerX = s_width / 2 - 136 // 2
+    playerY = s_height - 136
     playerX_change = 0
+    player_speed = 6
 
-    # Enemy
+    # Enemy (img size = 64 * 64 px)
     enemyImg = []
 
     for i in range(level_max):
@@ -86,7 +87,7 @@ def game():
     enemyY_change = 70
     enemyX_limit = s_width - 64
     enemy_num = 6
-    enemy_speed = 3  #default == 3
+    enemy_speed = 6  #default == 6
 
     #Initial enemy assign
     for i in range(enemy_num):
@@ -120,12 +121,12 @@ def game():
     def fire_bullet(bullet_num):
         global bullet
         bullet[bullet_num][2] = "fire"
-        screen.blit(bulletImg, (bullet[bullet_num][0] + 16, bullet[bullet_num][1] + 10))
+        screen.blit(bulletImg, (bullet[bullet_num][0] + 64 // 2, bullet[bullet_num][1] + bulletY_change))
 
 
     def isCollision(enemyX, enemyY, bulletX, bulletY):
         distance = math.sqrt(math.pow(enemyX - bulletX, 2) + (math.pow(enemyY - bulletY, 2)))
-        if distance < 27:
+        if distance < 64 // 2:
             return True
         else:
             return False
@@ -165,12 +166,12 @@ def game():
             if playerX <= 0:
                 playerX = 0
             else:
-                playerX -= 5
+                playerX -= player_speed
         elif keys[pygame.K_RIGHT]:
             if playerX >= s_width - 64:
                 playerX = s_width - 64
             else:
-                playerX += 5
+                playerX += player_speed
 
         # Level System
         if score_value == level_next:
