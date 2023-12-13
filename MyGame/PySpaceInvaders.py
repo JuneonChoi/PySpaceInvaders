@@ -58,9 +58,6 @@ def game():
     
     clock = pygame.time.Clock()
 
-    # Game Over
-    over_font = pygame.font.Font('freesansbold.ttf', 64)
-
     # Score
     score_font = pygame.font.Font('freesansbold.ttf', 32)
     scoreX = 10
@@ -119,11 +116,6 @@ def game():
     def show_level(x, y):
         level = level_font.render("Level  : " + str(level_value), True, red)
         screen.blit(level, (x, y))
-
-    def game_over_text():
-        over_text = over_font.render("GAME OVER", True, white)
-        screen.blit(over_text, (200, 250))
-
 
     def player(x, y):
         screen.blit(playerImg, (x, y))
@@ -211,7 +203,6 @@ def game():
             if enemyY[i] > playerY :
                 for j in range(enemy_num):
                     enemyY[j] = 9999  #Enemy disapear when game overs
-                game_over_text()
                 ans = messagebox.askretrycancel("askretrycancel", "Try again?")
                 root=Tk()
                 root.destroy()
