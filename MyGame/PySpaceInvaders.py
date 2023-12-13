@@ -146,6 +146,8 @@ def game():
                 #Quit
                 if event.key == pygame.K_ESCAPE:
                     running = False
+                    ans = False  #Don't create message box to ask player
+                    return ans
                 #Shoot
                 if event.key == pygame.K_SPACE:
                     for i in range(len(bullet)):
