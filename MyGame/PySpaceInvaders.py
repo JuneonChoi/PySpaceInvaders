@@ -143,6 +143,8 @@ def game():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+                ans = False  #Don't create message box to ask player
+                return ans
             if event.type == pygame.KEYDOWN:
                 #Quit
                 if event.key == pygame.K_ESCAPE:
