@@ -16,7 +16,14 @@ s_height = 800
 screen = pygame.display.set_mode((s_width, s_height))
 
 # Background
-background = pygame.image.load('background.png')
+
+backgroundImgs = []
+
+for i in range(150):
+    backgroundImgs.append(pygame.image.load('background/background'+ str(i+1) +'.png'))
+
+backgroundImg_index = 0
+backgroundImg = backgroundImgs[backgroundImg_index]
 
 # Sound
 mixer.music.load("background.wav")
@@ -145,7 +152,8 @@ def game():
         screen.fill(black)
         
         # Background Image
-        screen.blit(background, (0, 0))
+        global backgroundImg
+        screen.blit(backgroundImg, (0, 0))
 
         #control
         for event in pygame.event.get():
@@ -259,6 +267,12 @@ def game():
         if bulletImg_index >= len(bulletImgs):
             bulletImg_index = 0
         bulletImg = bulletImgs[bulletImg_index]
+
+        global backgroundImg_index
+        backgroundImg_index += 1
+        if backgroundImg_index >= len(backgroundImgs):
+            backgroundImg_index = 0
+        backgroundImg = backgroundImgs[backgroundImg_index]
 
         pygame.display.flip()
         clock.tick(60)
