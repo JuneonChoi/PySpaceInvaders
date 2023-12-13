@@ -87,7 +87,7 @@ def game():
     playerX = s_width / 2 - 136 // 2
     playerY = s_height - 136
     playerX_change = 0
-    player_speed = 6
+    player_speed = 8
 
     # Enemy (img size = 64 * 64 px)
     enemyImg = []
@@ -102,7 +102,7 @@ def game():
     enemyY_change = 70
     enemyX_limit = s_width - 64
     enemy_num = 6
-    enemy_speed = 6  #default == 6
+    enemy_speed = 8  #default == 8
 
     #Initial enemy assign
     for i in range(enemy_num):
@@ -142,7 +142,7 @@ def game():
 
     def isCollision(enemyX, enemyY, bulletX, bulletY):
         distance = math.sqrt(math.pow(enemyX - bulletX, 2) + (math.pow(enemyY - bulletY, 2)))
-        if distance < 64 // 2:
+        if distance < 42:
             return True
         else:
             return False
@@ -196,7 +196,7 @@ def game():
             if level_value < level_max:
                 level_value += 1
                 level_next += level_next
-                enemy_speed += level_value - 1
+                enemy_speed += enemy_speed // 4
                 enemy_num += level_value
                 
                 for i in range(enemy_num):  #For not to be out of index
@@ -208,7 +208,7 @@ def game():
         for i in range(enemy_num):
 
             # Game Over
-            if enemyY[i] > playerY - 40:
+            if enemyY[i] > playerY :
                 for j in range(enemy_num):
                     enemyY[j] = 9999  #Enemy disapear when game overs
                 game_over_text()
@@ -244,7 +244,7 @@ def game():
             
         # Bullet Movement
         for j in range(len(bullet)):
-            if bullet[j][1] <= 0:
+            if bullet[j][1] <= - 64:
                 bullet[j][1] = playerY
                 bullet[j][2] = "ready"
 
