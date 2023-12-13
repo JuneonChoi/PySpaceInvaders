@@ -32,7 +32,13 @@ pygame.display.set_icon(icon)
 # Ready - You can't see the bullet on the screen
 # Fire - The bullet is currently moving
 
-bulletImg = pygame.image.load('bullet.png')
+bulletImgs = []
+
+for i in range(6):
+    bulletImgs.append(pygame.image.load('bullet/bullet'+ str(i+1) +'.png'))
+
+bulletImg_index = 0
+bulletImg = bulletImgs[bulletImg_index]
 bulletSound = mixer.Sound("laser.wav")
 bullet_InScreen = 3
 bullet = [[-100, -100, "ready"] for i in range(bullet_InScreen)]  #x,y,state
@@ -49,6 +55,8 @@ def game():
 
     # Game Loop
     running = True
+    
+    clock = pygame.time.Clock()
 
     # Game Over
     over_font = pygame.font.Font('freesansbold.ttf', 64)
@@ -68,7 +76,14 @@ def game():
     level_next = 3
 
     # Player (img size = 136 * 136 px)
-    playerImg = pygame.image.load('player.png')
+    playerImgs = []
+
+    for i in range(24):
+        playerImgs.append(pygame.image.load('player/player'+ str(i+1) +'.png'))
+
+    playerImg_index = 0
+    playerImg = playerImgs[playerImg_index]
+    
     playerX = s_width / 2 - 136 // 2
     playerY = s_height - 136
     playerX_change = 0
@@ -120,6 +135,7 @@ def game():
 
     def fire_bullet(bullet_num):
         global bullet
+        global bulletImg
         bullet[bullet_num][2] = "fire"
         screen.blit(bulletImg, (bullet[bullet_num][0] + 64 // 2, bullet[bullet_num][1] + bulletY_change))
 
@@ -240,6 +256,21 @@ def game():
         show_score(scoreX, scoreY)
         show_level(levelX, levelY)
         pygame.display.update()
+
+         # Animation sprite index cycle        
+        playerImg_index += 1
+        if playerImg_index >= len(playerImgs):
+            playerImg_index = 0
+        playerImg = playerImgs[playerImg_index]
+
+        global bulletImg_index
+        bulletImg_index += 1
+        if bulletImg_index >= len(bulletImgs):
+            bulletImg_index = 0
+        bulletImg = bulletImgs[bulletImg_index]
+
+        pygame.display.flip()
+        clock.tick(60)
 
     #Ask if player wants to restart
     ans = messagebox.askretrycancel("askretrycancel", "Try again?")
