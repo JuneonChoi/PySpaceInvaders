@@ -1,6 +1,5 @@
 import math
 import random
-import time
 
 import pygame
 from pygame import mixer
@@ -89,6 +88,7 @@ def game():
     enemy_num = 6
     enemy_speed = 3  #default == 3
 
+    #Initial enemy assign
     for i in range(enemy_num):
         enemyX.append(random.randrange(0, enemyX_limit, 70))  #enemy_size w/ some space == 70
         enemyY.append(random.randrange(50, 190, 70))
@@ -133,16 +133,20 @@ def game():
     while running:
 
         # RGB = Red, Green, Blue
-        screen.fill((0, 0, 0))
+        screen.fill(black)
+        
         # Background Image
         screen.blit(background, (0, 0))
+
+        #control
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            #Quit
             if event.type == pygame.KEYDOWN:
+                #Quit
                 if event.key == pygame.K_ESCAPE:
                     running = False
+                #Shoot
                 if event.key == pygame.K_SPACE:
                     for i in range(len(bullet)):
                         if bullet[i][2] == "ready":
@@ -151,6 +155,7 @@ def game():
                             # Get the current x cordinate of the spaceship
                             bullet[i][0] = playerX
                             fire_bullet(i)
+                            
         #Player movement
         pygame.event.pump()
         keys = pygame.key.get_pressed()
@@ -164,38 +169,35 @@ def game():
                 playerX = s_width - 64
             else:
                 playerX += 5
-            
-        # 5 = 5 + -0.1 -> 5 = 5 - 0.1
-        # 5 = 5 + 0.1
 
         # Level System
         if score_value == level_next:
             if level_value < level_max:
                 level_value += 1
                 level_next += level_next
-
                 enemy_speed += level_value - 1
                 enemy_num += level_value
                 
-                for i in range(enemy_num):  #for not to be out of index
+                for i in range(enemy_num):  #For not to be out of index
                     enemyX.append(random.randrange(0, enemyX_limit, 70))
                     enemyY.append(random.randrange(50, 190, 70))
                     enemyX_change.append(enemy_speed)
 
-        # Enemy Movement
+        
         for i in range(enemy_num):
 
             # Game Over
             if enemyY[i] > playerY - 40:
                 for j in range(enemy_num):
-                    enemyY[j] = 9999
+                    enemyY[j] = 9999  #Enemy disapear when game overs
                 game_over_text()
                 ans = messagebox.askretrycancel("askretrycancel", "Try again?")
                 root=Tk()
                 root.destroy()
                 return ans
                 break
-
+            
+            # Enemy Movement - 1
             enemyX[i] += enemyX_change[i]
             if enemyX[i] <= 0:
                 enemyX_change[i] = enemy_speed
@@ -203,8 +205,9 @@ def game():
             elif enemyX[i] >= enemyX_limit:
                 enemyX_change[i] = -enemy_speed
                 enemyY[i] += enemyY_change
+                
+            # Collision
             for j in range(len(bullet)):
-                # Collision
                 collision = isCollision(enemyX[i], enemyY[i], bullet[j][0], bullet[j][1])
                 if collision:
                     explosionSound = mixer.Sound("explosion.wav")
@@ -214,7 +217,8 @@ def game():
                     score_value += 1
                     enemyX[i] = random.randrange(0, enemyX_limit, 70)  #enemy_size w/ some space == 70
                     enemyY[i] = random.randrange(50, 190, 70)
-
+                    
+            # Enemy Movement - 2
             enemy(enemyX[i], enemyY[i], level_value - 1)
             
         # Bullet Movement
@@ -231,10 +235,14 @@ def game():
         show_score(scoreX, scoreY)
         show_level(levelX, levelY)
         pygame.display.update()
+
+    #Ask if player wants to restart
     ans = messagebox.askretrycancel("askretrycancel", "Try again?")
     root=Tk()
     root.destroy()
     return ans
+
+#If player choose yes in message box, restart the game
 while True:
   if game() == True:
     pass
